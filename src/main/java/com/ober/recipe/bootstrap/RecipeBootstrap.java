@@ -4,15 +4,18 @@ import com.ober.recipe.domain.*;
 import com.ober.recipe.repositories.CategoryRepository;
 import com.ober.recipe.repositories.RecipeRepository;
 import com.ober.recipe.repositories.UnitOfMeasureRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -27,11 +30,15 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
     }
 
     @Override
+    @Transactional
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         recipeRepository.saveAll(getRecipes());
+        log.debug("Loading bootstrap data...");
     }
 
     private List<Recipe> getRecipes() {
+
+        log.debug("Starting recipe bootstrap...");
 
         List<Recipe> recipes = new ArrayList<>(2);
 
@@ -80,6 +87,8 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         UnitOfMeasure pintUom = pintUomOptional.get();
         UnitOfMeasure cupUom = cupUomOptional.get();
 
+        log.debug("Got unit of measures...");
+
         // get categories
         Optional<Category> americanCategoryOptional = categoryRepository.findByDescription("American");
 
@@ -110,6 +119,8 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         Category italianCategory = italianCategoryOptional.get();
         Category mexicanCategory = mexicanCategoryOptional.get();
         Category fastFoodCategory = fastFoodCategoryOptional.get();
+
+        log.debug("Got categories...");
 
         // Guac
         Recipe guacRecipe = new Recipe();
@@ -221,6 +232,8 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         tacosRecipe.getCategories().add(mexicanCategory);
 
         recipes.add(tacosRecipe);
+
+        log.debug("Finished creating recipes!");
 
         return recipes;
 
