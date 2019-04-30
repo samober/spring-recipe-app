@@ -1,18 +1,19 @@
 package com.ober.recipe.services;
 
+import com.ober.recipe.converters.*;
 import com.ober.recipe.domain.Recipe;
 import com.ober.recipe.repositories.RecipeRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class RecipeServiceImplTest {
@@ -26,7 +27,13 @@ public class RecipeServiceImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        recipeService = new RecipeServiceImpl(recipeRepository);
+        recipeService = new RecipeServiceImpl(recipeRepository,
+                new RecipeCommandToRecipe(new CategoryCommandToCategory(),
+                        new IngredientCommandToIngredient(new UnitOfMeasureCommandToUnitOfMeasure()),
+                        new NotesCommandToNotes()),
+                new RecipeToRecipeCommand(new CategoryToCategoryCommand(),
+                        new IngredientToIngredientCommand(new UnitOfMeasureToUnitOfMeasureCommand()),
+                        new NotesToNotesCommand()));
     }
 
     @Test
